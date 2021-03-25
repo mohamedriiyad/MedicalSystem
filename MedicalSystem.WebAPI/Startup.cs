@@ -11,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MedicalSystem.Infra.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace MedicalSystem.WebAPI
 {
@@ -26,6 +29,10 @@ namespace MedicalSystem.WebAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<MedicalSystemDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("MedicalSystemConnection")));
+            services.AddIdentityCore<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<MedicalSystemDbContext>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
