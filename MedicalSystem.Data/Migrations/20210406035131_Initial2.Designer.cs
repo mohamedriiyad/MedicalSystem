@@ -4,14 +4,16 @@ using MedicalSystem.Infra.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MedicalSystem.Infra.Data.Migrations
 {
     [DbContext(typeof(MedicalSystemDbContext))]
-    partial class MedicalSystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210406035131_Initial2")]
+    partial class Initial2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

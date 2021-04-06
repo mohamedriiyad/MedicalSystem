@@ -38,6 +38,7 @@ namespace MedicalSystem.WebAPI
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MedicalSystem.WebAPI", Version = "v1" });
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
         }
 
@@ -48,7 +49,7 @@ namespace MedicalSystem.WebAPI
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MedicalSystem.WebAPI v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("v1/swagger.json", "MedicalSystem.WebAPI v1"));
             }
 
             app.UseHttpsRedirection();

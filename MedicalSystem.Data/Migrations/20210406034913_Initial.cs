@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MedicalSystem.Infra.Data.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -26,6 +26,16 @@ namespace MedicalSystem.Infra.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PatientSsn = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FullName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Birthdate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FirstRelativeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirstRelativePhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecondRelativeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecondRelativePhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -152,6 +162,88 @@ namespace MedicalSystem.Infra.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "MedicalHistory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BloodType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MedicalHistory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MedicalHistory_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Diseases",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MedicalHistoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Diseases", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Diseases_MedicalHistory_MedicalHistoryId",
+                        column: x => x.MedicalHistoryId,
+                        principalTable: "MedicalHistory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Operations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MedicalHistoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Operations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Operations_MedicalHistory_MedicalHistoryId",
+                        column: x => x.MedicalHistoryId,
+                        principalTable: "MedicalHistory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sensitivities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MedicalHistoryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sensitivities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sensitivities_MedicalHistory_MedicalHistoryId",
+                        column: x => x.MedicalHistoryId,
+                        principalTable: "MedicalHistory",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -190,6 +282,28 @@ namespace MedicalSystem.Infra.Data.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Diseases_MedicalHistoryId",
+                table: "Diseases",
+                column: "MedicalHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MedicalHistory_ApplicationUserId",
+                table: "MedicalHistory",
+                column: "ApplicationUserId",
+                unique: true,
+                filter: "[ApplicationUserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Operations_MedicalHistoryId",
+                table: "Operations",
+                column: "MedicalHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sensitivities_MedicalHistoryId",
+                table: "Sensitivities",
+                column: "MedicalHistoryId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -210,7 +324,19 @@ namespace MedicalSystem.Infra.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Diseases");
+
+            migrationBuilder.DropTable(
+                name: "Operations");
+
+            migrationBuilder.DropTable(
+                name: "Sensitivities");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "MedicalHistory");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
